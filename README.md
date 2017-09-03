@@ -5,14 +5,15 @@
 **This project is not aimed at public consumption.
 It exists to serve as a single endpoint for SICZ containers.**
 
-An advanced open source ETL processor.
+[Logstash](https://www.elastic.co/products/logstash) is an advanced open source
+ETL processor.
 
 ## Contents
 
 This container only contains essential components:
 * [sicz/openjdk:8-jre-centos](https://github.com/sicz/docker-openjdk)
   as a base image.
-* [Logstash](https://www.elastic.co/products/logstash) provides an advanced
+* [Logstash](https://www.elastic.co/products/logstash) is an advanced
   open source ETL processor.
 * [Logstash X-Pack plugin](https://www.elastic.co/products/x-pack) adds
   monitoring to Logstash
