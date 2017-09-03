@@ -17,9 +17,13 @@ services:
     environment:
       - DOCKER_ENTRYPOINT_DEBUG=true
       - DOCKER_ENTRYPOINT_INFO=true
+      - JAVA_TRUSTSTORE_PWD_FILE=/usr/share/logstash/config/truststore.pwd
+      - JAVA_KEYSTORE_PWD_FILE=/usr/share/logstash/config/keystore.pwd
       - SERVER_CRT_HOST=${SERVER_CRT_HOST}
       - SIMPLE_CA_URL=https://simple-ca.local
     expose:
+      # Logstash TCP input
+      - 5000/tcp
       # Logstash Metrics REST Endpoint
       - 9600/tcp
     networks:

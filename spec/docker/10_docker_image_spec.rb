@@ -19,7 +19,7 @@ describe "Docker image", :test => :docker_image do
   describe "Users" do
     [
       # [user,                      uid,  primary_group]
-      ["lighttpd",                  1000, "lighttpd"],
+      ["logstash",                  1000, "logstash"],
     ].each do |user, uid, primary_group|
       context user(user) do
         it { is_expected.to exist }
@@ -34,7 +34,7 @@ describe "Docker image", :test => :docker_image do
   describe "Groups" do
     [
       # [group,                     gid]
-      ["lighttpd",                  1000],
+      ["logstash",                  1000],
     ].each do |group, gid|
       context group(group) do
         it { is_expected.to exist }
@@ -49,9 +49,6 @@ describe "Docker image", :test => :docker_image do
     [
       # [package,                   version,                    installer]
       "bash",
-      "libressl",
-      ["lighttpd",                  ENV["LIGHTTPD_VERSION"]],
-      ["lighttpd-mod_auth",         ENV["LIGHTTPD_VERSION"]],
     ].each do |package, version, installer|
       describe package(package) do
         it { is_expected.to be_installed }                        if installer.nil? && version.nil?
@@ -62,23 +59,44 @@ describe "Docker image", :test => :docker_image do
     end
   end
 
+  ### COMMANDS #################################################################
+
+  describe "Commands" do
+
+    # [command, version, args]
+    commands = [
+      ["/usr/lib/jvm/jre/bin/java",         ENV["DOCKER_VERSION"], "-version"],
+      ["/usr/share/logstash/bin/logstash",  ENV["DOCKER_VERSION"]],
+    ]
+
+    commands.each do |command, version, args|
+      describe "Command \"#{command}\"" do
+        subject { file(command) }
+        let(:version_regex) { /\W#{version}\W/ }
+        let(:version_cmd) { "#{command} #{args.nil? ? "--version" : "#{args}"}" }
+        it "should be installed#{version.nil? ? nil : " with version \"#{version}\""}" do
+          expect(subject).to exist
+          expect(subject).to be_executable
+          expect(command(version_cmd).stdout).to match(version_regex) unless version.nil?
+        end
+      end
+    end
+  end
+
   ### FILES ####################################################################
 
   describe "Files" do
     [
       # [file,                                            mode, user,       group,      [expectations]]
       ["/docker-entrypoint.sh",                           755, "root",      "root",     [:be_file]],
-      ["/docker-entrypoint.d/30-environment-lighttpd.sh", 644, "root",      "root",     [:be_file]],
-      ["/docker-entrypoint.d/47-lighttpd-cert.sh",        644, "root",      "root",     [:be_file]],
-      ["/docker-entrypoint.d/50-lighttpd-logs.sh",        644, "root",      "root",     [:be_file, :eq_sha256sum]],
-      ["/etc/lighttpd/lighttpd.conf",                     644, "root",      "root",     [:be_file, :eq_sha256sum]],
-      ["/etc/lighttpd/logs.conf",                         644, "root",      "root",     [:be_file, :eq_sha256sum]],
-      ["/etc/lighttpd/server.conf",                       644, "root",      "root",     [:be_file, :eq_sha256sum]],
-      ["/etc/ssl/openssl.cnf",                            644, "root",      "root",     [:be_file]],
-      ["/var/cache/lighttpd",                             750, "lighttpd",  "lighttpd", [:be_directory]],
-      ["/var/lib/lighttpd",                               750, "lighttpd",  "lighttpd", [:be_directory]],
-      ["/var/log/lighttpd",                               750, "lighttpd",  "lighttpd", [:be_directory]],
-      ["/var/www",                                        755, "root",      "root",     [:be_directory]],
+      ["/docker-entrypoint.d/30-environment-logstash.sh", 644, "root",      "root",     [:be_file, :eq_sha256sum]],
+      ["/docker-entrypoint.d/50-logstash-conf.sh",        644, "root",      "root",     [:be_file, :eq_sha256sum]],
+      ["/usr/share/logstash",                             755, "root",      "root",     [:be_directory]],
+      ["/usr/share/logstash/bin",                         755, "root",      "root",     [:be_directory]],
+      ["/usr/share/logstash/config",                      750, "logstash",  "logstash", [:be_directory]],
+      ["/usr/share/logstash/data",                        750, "logstash",  "logstash", [:be_directory]],
+      ["/usr/share/logstash/logs",                        750, "logstash",  "logstash", [:be_directory]],
+      ["/usr/share/logstash/pipeline",                    750, "logstash",  "logstash", [:be_directory]],
     ].each do |file, mode, user, group, expectations|
       expectations ||= []
       context file(file) do
