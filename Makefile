@@ -1,11 +1,11 @@
 ### BASE_IMAGE #################################################################
 
 BASE_IMAGE_NAME		?= $(DOCKER_PROJECT)/openjdk
-BASE_IMAGE_TAG		?= 8-jre-centos
+BASE_IMAGE_TAG		?= 8u141-jre-centos
 
 ### DOCKER_IMAGE ###############################################################
 
-LOGSTASH_VERSION		?= 5.5.2
+LOGSTASH_VERSION	?= 5.5.2
 
 DOCKER_PROJECT		?= sicz
 DOCKER_PROJECT_DESC	?= An advanced open source ETL processor
