@@ -3,7 +3,7 @@
 ### LS_PATH ####################################################################
 
 # Create missing directories
-mkdir -p ${LS_PATH_CONFIG} ${LS_PATH_DATA} ${LS_PATH_LOGS}
+mkdir -p ${LOGSTASH_HOME}/config ${LS_PATH_CONFIG} ${LS_PATH_DATA} ${LS_PATH_LOGS}
 
 ### XPACK_MONITORING ###########################################################
 
@@ -53,7 +53,7 @@ fi
 ### LS_PATH ####################################################################
 
 # Set permissions
-chown -R ${DOCKER_USER}:${DOCKER_GROUP} ${LS_PATH_CONFIG} ${LS_PATH_DATA} ${LS_PATH_LOGS}
-chmod -R o-rwx ${LS_PATH_CONFIG} ${LS_PATH_DATA} ${LS_PATH_LOGS}
+chown -R ${DOCKER_USER}:${DOCKER_GROUP} ${LOGSTASH_HOME}/config ${LS_PATH_CONFIG} ${LS_PATH_DATA} ${LS_PATH_LOGS}
+chmod -R o-rwx ${LOGSTASH_HOME}/config ${LS_PATH_CONFIG} ${LS_PATH_DATA} ${LS_PATH_LOGS}
 
 ################################################################################
