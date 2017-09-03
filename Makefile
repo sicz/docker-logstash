@@ -17,7 +17,7 @@ DOCKER_IMAGE_TAGS	?= latest
 
 ### DOCKER_VERSIONS ############################################################
 
-# DOCKER_VERSIONS		?= latest devel
+DOCKER_VERSIONS		?= latest devel
 
 ### BUILD ######################################################################
 
