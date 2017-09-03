@@ -56,8 +56,8 @@ services:
       - DOCKER_ENTRYPOINT_DEBUG=true
       - DOCKER_ENTRYPOINT_INFO=true
       # Wait until the tested container is started
-      - WAIT_FOR_URL=http://container.local https://container.local
-      - WAIT_FOR_TIMEOUT=5
+      - WAIT_FOR_TCP=container.local:5000
+      - WAIT_FOR_TIMEOUT=30
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - simple_ca_secrets:/run/secrets:ro
@@ -73,8 +73,8 @@ services:
       - DOCKER_ENTRYPOINT_DEBUG=true
       - DOCKER_ENTRYPOINT_INFO=true
       # Wait until the tested container is started
-      - WAIT_FOR_URL=http://container.local https://container.local
-      - WAIT_FOR_TIMEOUT=5
+      - WAIT_FOR_TCP=container.local:5000
+      - WAIT_FOR_TIMEOUT=30
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - simple_ca_secrets:/run/secrets:ro
