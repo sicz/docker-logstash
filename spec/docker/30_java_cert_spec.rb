@@ -15,7 +15,7 @@ describe "Java certificate", :test => :java_cert do
   truststore_pwd    = "/usr/share/logstash/config/truststore.pwd"
   truststore_user   = "logstash"
   truststore_group  = "logstash"
-  truststore_mode   = 444
+  truststore_mode   = 440
 
   keystore          = "/usr/share/logstash/config/keystore.jks"
   keystore_pwd      = "/usr/share/logstash/config/keystore.pwd"
