@@ -16,7 +16,7 @@ This container only contains essential components:
 * [Logstash](https://www.elastic.co/products/logstash) is an advanced
   open source ETL processor.
 * [Logstash X-Pack plugin](https://www.elastic.co/products/x-pack) adds
-  monitoring to Logstash
+  monitoring to Logstash.
 
 ## Getting started
 
