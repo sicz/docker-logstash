@@ -21,8 +21,8 @@ LABEL \
 
 ARG LOGSTASH_VERSION
 ENV LOGSTASH_HOME=/usr/share/logstash
-ARG LOGSTASH_TARBALL=logstash-${LOGSTASH_VERSION}
-ARG LOGSTASH_TARBALL_URL=https://artifacts.elastic.co/downloads/logstash/${LOGSTASH_TARBALL}.tar.gz
+ARG LOGSTASH_TARBALL=logstash-${LOGSTASH_VERSION}.tar.gz
+ARG LOGSTASH_TARBALL_URL=https://artifacts.elastic.co/downloads/logstash/${LOGSTASH_TARBALL}
 
 ENV \
   DOCKER_USER=logstash \
@@ -33,12 +33,12 @@ WORKDIR ${LOGSTASH_HOME}
 
 RUN set -exo pipefail; \
   adduser --uid 1000 --user-group --home-dir ${LOGSTASH_HOME} ${DOCKER_USER}; \
-  curl -fLo /tmp/${LOGSTASH_TARBALL}.tar.gz ${LOGSTASH_TARBALL_URL}; \
-  EXPECTED_SHA1=$(curl ${LOGSTASH_TARBALL_URL}.sha1); \
-  TARBALL_SHA1=$(sha1sum /tmp/${LOGSTASH_TARBALL}.tar.gz | cut -d ' ' -f 1); \
+  curl -fLo /tmp/${LOGSTASH_TARBALL} ${LOGSTASH_TARBALL_URL}; \
+  EXPECTED_SHA1=$(curl -fL ${LOGSTASH_TARBALL_URL}.sha1); \
+  TARBALL_SHA1=$(sha1sum /tmp/${LOGSTASH_TARBALL} | cut -d ' ' -f 1); \
   [ "${TARBALL_SHA1}" = "${EXPECTED_SHA1}" ]; \
-  tar xz --strip-components=1 -f /tmp/${LOGSTASH_TARBALL}.tar.gz; \
-  rm -f /tmp/${LOGSTASH_TARBALL}.tar.gz; \
+  tar xz --strip-components=1 -f /tmp/${LOGSTASH_TARBALL}; \
+  rm -f /tmp/${LOGSTASH_TARBALL}; \
   mkdir -p config data logs pipeline; \
   chown -R root:root .; \
   logstash-plugin install x-pack; \
