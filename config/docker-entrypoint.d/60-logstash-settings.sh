@@ -57,7 +57,8 @@ fi
 ### LS_PATH ####################################################################
 
 # Set permissions
-chown -R ${DOCKER_USER}:${DOCKER_GROUP} ${LOGSTASH_HOME}/config ${LS_PATH_CONFIG} ${LS_PATH_DATA} ${LS_PATH_LOGS}
+chown -R root:root ${LOGSTASH_HOME}
+chown -R ${DOCKER_USER}:${DOCKER_GROUP} ${LOGSTASH_SETTINGS_DIR} ${LS_PATH_CONFIG} ${LS_PATH_DATA} ${LS_PATH_LOGS}
 chmod -R o-rwx ${LOGSTASH_SETTINGS_DIR} ${LS_PATH_CONFIG} ${LS_PATH_DATA} ${LS_PATH_LOGS}
 
 # Export Logstash settings dir
