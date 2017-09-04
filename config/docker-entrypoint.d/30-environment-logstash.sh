@@ -11,6 +11,9 @@ fi
 
 ### LS_PATH ####################################################################
 
+# Path to settings directory
+: ${LOGSTASH_SETTINGS_DIR:=${LOGSTASH_HOME}/config}
+
 # Path to configuration file or directory
 : ${LS_PATH_CONFIG=${LOGSTASH_HOME}/pipeline}
 
@@ -36,7 +39,7 @@ fi
 if [ -e /run/secrets/es_${ELASTICSEARCH_USERNAME}_pwd ]; then
   : ${ELASTICSEARCH_PASSWORD_FILE:=/run/secrets/es_${ELASTICSEARCH_USERNAME}.pwd}
 else
-  : ${ELASTICSEARCH_PASSWORD_FILE:=${LOGSTASH_HOME}/config/es_${ELASTICSEARCH_USERNAME}.pwd}
+  : ${ELASTICSEARCH_PASSWORD_FILE:=${LOGSTASH_SETTINGS_DIR}/es_${ELASTICSEARCH_USERNAME}.pwd}
 fi
 
 # Export Logstash user name and password to be used in the Logstash filters
@@ -66,7 +69,7 @@ fi
 if [ -e /run/secrets/es_${XPACK_MONITORING_ELASTICSEARCH_USERNAME}_pwd ]; then
   : ${XPACK_MONITORING_ELASTICSEARCH_PASSWORD_FILE:=/run/secrets/es_${XPACK_MONITORING_ELASTICSEARCH_USERNAME}.pwd}
 else
-  : ${XPACK_MONITORING_ELASTICSEARCH_PASSWORD_FILE:=${LOGSTASH_HOME}/config/es_${XPACK_MONITORING_ELASTICSEARCH_USERNAME}.pwd}
+  : ${XPACK_MONITORING_ELASTICSEARCH_PASSWORD_FILE:=${LOGSTASH_SETTINGS_DIR}/es_${XPACK_MONITORING_ELASTICSEARCH_USERNAME}.pwd}
 fi
 
 # Load Logstash user password
