@@ -44,3 +44,5 @@ RUN set -exo pipefail; \
   chown -R root:root .
 
 COPY config /
+
+CMD ["-f", "pipeline"]
