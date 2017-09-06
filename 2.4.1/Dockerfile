@@ -42,7 +42,5 @@ RUN set -exo pipefail; \
   rm -f /tmp/${LOGSTASH_TARBALL}; \
   mkdir -p config data logs pipeline; \
   chown -R root:root .; \
-  mv config/logstash.yml config/logstash.default.yml; \
-  mv config/log4j2.properties config/log4j2.default.properties
 
 COPY config /
