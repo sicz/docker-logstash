@@ -41,6 +41,6 @@ RUN set -exo pipefail; \
   tar xz --strip-components=1 -f /tmp/${LOGSTASH_TARBALL}; \
   rm -f /tmp/${LOGSTASH_TARBALL}; \
   mkdir -p config data logs pipeline; \
-  chown -R root:root .; \
+  chown -R root:root .
 
 COPY config /
