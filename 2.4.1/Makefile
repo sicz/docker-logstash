@@ -6,6 +6,8 @@ DOCKER_IMAGE_TAGS	?= 2.4
 
 ### BUILD ######################################################################
 
+VARIANT_DIR		?= $(CURDIR)
+
 BUILD_VARS		+= LOGSTASH_TARBALL \
 			   LOGSTASH_TARBALL_URL \
 			   LOGSTASH_TARBALL_SHA1_URL
