@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: sicz/dockerspec@sha256:217e4ee091029d09ade6f82d6a58c2c7b5c00519c287cda49c13f142c26d26fe
+      - image: sicz/dockerspec
     environment:
       - MAKEFLAGS=--no-print-directory
       - RSPEC_FORMAT=doc
@@ -23,12 +23,18 @@ jobs:
             curl -sSL https://github.com/SICZ/Mk/archive/master.tar.gz | tar -xzf -
             mv Mk-master Mk
       - run:
-          name: sicz/logstash:latest
+          name: sicz/logstash:2.4.1
+          working_directory: 2.4.1
           command: |
             make ci
       - run:
-          name: sicz/logstash:devel
-          working_directory: devel
+          name: sicz/logstash:5.5.2
+          working_directory: 5.5.2
+          command: |
+            make ci
+      - run:
+          name: sicz/logstash:6.0.0
+          working_directory: 6.0.0
           command: |
             make ci
       - deploy:
