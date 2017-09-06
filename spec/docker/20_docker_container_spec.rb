@@ -59,16 +59,16 @@ describe "Docker container", :test => :docker_container do
   ### PORTS ####################################################################
 
   # TODO: Specinfra due the bug is not able to test listening ports
-  # describe "Ports" do
-  #   [
-  #     # [port, proto]
-  #     [5000, "tcp"],
-  #   ].each do |port, proto|
-  #     context port(port) do
-  #       it { is_expected.to be_listening.with(proto) }
-  #     end
-  #   end
-  # end
+  describe "Ports" do
+    [
+      # [port, proto]
+      [5000, "tcp"],
+    ].each do |port, proto|
+      context port(port) do
+        it { is_expected.to be_listening.with(proto) }
+      end
+    end
+  end
 
   ### LOGSTASH #################################################################
 
