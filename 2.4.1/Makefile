@@ -8,14 +8,6 @@ DOCKER_IMAGE_TAGS	?= 2.4
 
 VARIANT_DIR		?= $(CURDIR)
 
-BUILD_VARS		+= LOGSTASH_TARBALL \
-			   LOGSTASH_TARBALL_URL \
-			   LOGSTASH_TARBALL_SHA1_URL
-
-LOGSTASH_TARBALL	?= logstash-${LOGSTASH_VERSION}.tar.gz
-LOGSTASH_TARBALL_URL	?= https://download.elastic.co/logstash/logstash/$(LOGSTASH_TARBALL)
-LOGSTASH_TARBALL_SHA1_URL ?= $(LOGSTASH_TARBALL_URL).sha1.txt
-
 ### MK_DOCKER_IMAGE ############################################################
 
 PROJECT_DIR		?= $(abspath ..)
