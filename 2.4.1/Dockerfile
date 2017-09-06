@@ -22,7 +22,7 @@ LABEL \
 ARG LOGSTASH_VERSION
 ENV LOGSTASH_HOME=/usr/share/logstash
 ARG LOGSTASH_TARBALL=logstash-${LOGSTASH_VERSION}.tar.gz
-ARG LOGSTASH_TARBALL_URL=https://download.elastic.co/downloads/logstash/${LOGSTASH_TARBALL}
+ARG LOGSTASH_TARBALL_URL=https://download.elastic.co/logstash/logstash/${LOGSTASH_TARBALL}
 ARG LOGSTASH_TARBALL_SHA1_URL=${LOGSTASH_TARBALL_URL}.sha1.txt
 
 ENV \
