@@ -41,6 +41,7 @@ describe "Docker container", :test => :docker_container do
   end
 
   ### PROCESSES ################################################################
+
   describe "Processes" do
     [
       # [process,                   user,             group,            pid]

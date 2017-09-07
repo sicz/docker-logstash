@@ -3,7 +3,7 @@
 ### LS_PATH ####################################################################
 
 # Create missing directories
-for DIR in ${LOGSTASH_SETTINGS_DIR} ${LS_PATH_CONFIG} ${LS_PATH_DATA} ${LS_PATH_LOGS}; do
+for DIR in ${LS_SETTINGS_DIR} ${LS_PATH_CONFIG} ${LS_PATH_DATA} ${LS_PATH_LOGS}; do
   if [ ! -e ${DIR} ]; then
     mkdir -p ${DIR}
   fi
@@ -22,46 +22,50 @@ fi
 
 ### LOGSTASH_YML ###############################################################
 
-if [ ! -e ${LOGSTASH_SETTINGS_DIR}/logstash.yml ]; then
-  info "Creating logstash.yml"
+if [ ! -e ${LS_SETTINGS_DIR}/logstash.yml ]; then
+  info "Creating ${LS_SETTINGS_DIR}/logstash.yml"
   (
-    for LOGSTASH_SETTINGS_FILE in ${LOGSTASH_SETTINGS_FILES}; do
-      cat ${LOGSTASH_SETTINGS_DIR}/${LOGSTASH_SETTINGS_FILE}
+    for LS_SETTINGS_FILE in ${LS_SETTINGS_FILES}; do
+      cat ${LS_SETTINGS_DIR}/${LS_SETTINGS_FILE}
     done
     while IFS='=' read -r KEY VAL; do
-      KEY=$(echo ${KEY} | sed -E 's/^LS_//' | tr '_[:upper:]' '.[:lower:]')
       if [ ! -z "${VAL}" ]; then
         echo "${KEY}: ${VAL}"
       fi
-    done < <(set | egrep '^(LS|XPACK)_' | sort | grep -v LOGSTASH_SETTINGS_DIR)
-  ) > ${LOGSTASH_SETTINGS_DIR}/logstash.yml
+    done < <(set | egrep "^(LS|XPACK)_" | egrep -v "^(LS_SETTINGS_)" | sed -E 's/^LS_//' | tr '_[:upper:]' '.[:lower:]' | sort)
+  ) > ${LS_SETTINGS_DIR}/logstash.yml
+  if [ -n "${DOCKER_ENTRYPOINT_DEBUG}" ]; then
+    cat ${LS_SETTINGS_DIR}/logstash.yml
+  fi
 fi
 
 ### LOG4J2_PROPERTIES ##########################################################
 
-if [ ! -e ${LOGSTASH_SETTINGS_DIR}/log4j2.properties ]; then
-  info "Creating log4j2.properties"
+if [ ! -e ${LS_SETTINGS_DIR}/log4j2.properties ]; then
+  info "Creating ${LS_SETTINGS_DIR}/log4j2.properties"
   (
     for LOG4J2_PROPERTIES_FILE in ${LOG4J2_PROPERTIES_FILES}; do
-      cat ${LOGSTASH_SETTINGS_DIR}/${LOG4J2_PROPERTIES_FILE}
+      cat ${LS_SETTINGS_DIR}/${LOG4J2_PROPERTIES_FILE}
     done
     while IFS='=' read -r KEY VAL; do
-      LS_KEY=$(echo ${KEY} | sed -E 's/^LOG4J2_//' | tr '_[:upper:]' '.[:lower:]')
       if [ ! -z "${VAL}" ]; then
         echo "${KEY} = ${VAL}"
       fi
-    done < <(set | egrep '^LOG4J2_' | sort | grep -v LOG4J2_PROPERTIES_FILE)
-  ) > ${LOGSTASH_SETTINGS_DIR}/log4j2.properties
+    done < <(set | egrep "^LOG4J2_" | egrep -v "^(LOG4J2_PROPERTIES_)" | sed -E 's/^LOG4J2_//' | tr '_[:upper:]' '.[:lower:]' | sort)
+  ) > ${LS_SETTINGS_DIR}/log4j2.properties
+  if [ -n "${DOCKER_ENTRYPOINT_DEBUG}" ]; then
+    cat ${LS_SETTINGS_DIR}/log4j2.properties
+  fi
 fi
 
 ### LS_PATH ####################################################################
 
 # Set permissions
 chown -R root:root ${LOGSTASH_HOME}
-chown -R ${DOCKER_USER}:${DOCKER_GROUP} ${LOGSTASH_SETTINGS_DIR} ${LS_PATH_CONFIG} ${LS_PATH_DATA} ${LS_PATH_LOGS}
-chmod -R o-rwx ${LOGSTASH_SETTINGS_DIR} ${LS_PATH_CONFIG} ${LS_PATH_DATA} ${LS_PATH_LOGS}
+chown -R ${DOCKER_USER}:${DOCKER_GROUP} ${LS_SETTINGS_DIR} ${LS_PATH_CONFIG} ${LS_PATH_DATA} ${LS_PATH_LOGS}
+chmod -R o-rwx ${LS_SETTINGS_DIR} ${LS_PATH_CONFIG} ${LS_PATH_DATA} ${LS_PATH_LOGS}
 
 # Export Logstash settings dir
-export LS_SETTINGS_DIR="${LOGSTASH_SETTINGS_DIR}"
+export LS_SETTINGS_DIR
 
 ################################################################################

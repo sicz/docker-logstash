@@ -10,8 +10,6 @@ networks:
 services:
   container:
     image: ${DOCKER_IMAGE}
-    # command: bash
-    # tty: true
     depends_on:
       - simple_ca
     environment:

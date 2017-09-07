@@ -2,7 +2,7 @@
 
 LOGSTASH_VERSION	?= 2.4.1
 
-DOCKER_IMAGE_TAGS	?= 2.4
+DOCKER_IMAGE_TAGS	?= 2.4 2
 
 ### BUILD ######################################################################
 

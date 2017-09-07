@@ -90,7 +90,6 @@ describe "Docker image", :test => :docker_image do
       # [file,                                            mode, user,       group,      [expectations]]
       ["/docker-entrypoint.sh",                           755, "root",      "root",     [:be_file]],
       ["/docker-entrypoint.d/30-environment-logstash.sh", 644, "root",      "root",     [:be_file, :eq_sha256sum]],
-      ["/docker-entrypoint.d/50-logstash-conf.sh",        644, "root",      "root",     [:be_file, :eq_sha256sum]],
       ["/docker-entrypoint.d/60-logstash-settings.sh",    644, "root",      "root",     [:be_file, :eq_sha256sum]],
       ["/usr/share/logstash",                             755, "root",      "root",     [:be_directory]],
       ["/usr/share/logstash/bin",                         755, "root",      "root",     [:be_directory]],
