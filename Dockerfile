@@ -47,3 +47,4 @@ RUN set -exo pipefail; \
   mv config/log4j2.properties config/log4j2.default.properties
 
 COPY config /
+COPY ${DOCKER_IMAGE_TAG}/config /

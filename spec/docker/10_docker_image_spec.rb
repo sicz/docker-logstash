@@ -87,9 +87,10 @@ describe "Docker image", :test => :docker_image do
 
   describe "Files" do
     [
-      # [file,                                            mode, user,       group,      [expectations]]
+      # [file,                                            mode, user,       group,      [expectations], localdir]
       ["/docker-entrypoint.sh",                           755, "root",      "root",     [:be_file]],
       ["/docker-entrypoint.d/30-environment-logstash.sh", 644, "root",      "root",     [:be_file, :eq_sha256sum]],
+      ["/docker-entrypoint.d/31-environment-xpack.sh",    644, "root",      "root",     [:be_file, :eq_sha256sum], ENV["DOCKER_IMAGE_TAG"]],
       ["/docker-entrypoint.d/60-logstash-settings.sh",    644, "root",      "root",     [:be_file, :eq_sha256sum]],
       ["/usr/share/logstash",                             755, "root",      "root",     [:be_directory]],
       ["/usr/share/logstash/bin",                         755, "root",      "root",     [:be_directory]],
@@ -97,8 +98,9 @@ describe "Docker image", :test => :docker_image do
       ["/usr/share/logstash/data",                        750, "logstash",  "logstash", [:be_directory]],
       ["/usr/share/logstash/logs",                        750, "logstash",  "logstash", [:be_directory]],
       ["/usr/share/logstash/pipeline",                    750, "logstash",  "logstash", [:be_directory]],
-    ].each do |file, mode, user, group, expectations|
+    ].each do |file, mode, user, group, expectations, localdir|
       expectations ||= []
+      localdir = "." if localdir.nil?
       context file(file) do
         it { is_expected.to exist }
         it { is_expected.to be_file }       if expectations.include?(:be_file)
@@ -108,7 +110,7 @@ describe "Docker image", :test => :docker_image do
         it { is_expected.to be_grouped_into(group) } unless group.nil?
         its(:sha256sum) do
           is_expected.to eq(
-              Digest::SHA256.file("config/#{subject.name}").to_s
+              Digest::SHA256.file("#{localdir}/config/#{subject.name}").to_s
           )
         end if expectations.include?(:eq_sha256sum)
       end

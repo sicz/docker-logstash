@@ -44,5 +44,6 @@ RUN set -exo pipefail; \
   chown -R root:root .
 
 COPY config /
+COPY ${DOCKER_IMAGE_TAG}/config /
 
 CMD ["-f", "pipeline"]
