@@ -14,6 +14,32 @@ describe "Docker image", :test => :docker_image do
     it { is_expected.to exist }
   end
 
+  ### OS #######################################################################
+
+  describe "Operating system" do
+    context "family" do
+      # We can not simple test the os[:family] because CentOS is reported as "redhat"
+      subject { file("/etc/centos-release") }
+      it "sould eq \"centos\"" do
+        expect(subject).to be_file
+      end
+    end
+    context "locale" do
+      context "CHARSET" do
+        subject { command("echo ${CHARSET}") }
+        it { expect(subject.stdout.strip).to eq("UTF-8") }
+      end
+      context "LANG" do
+        subject { command("echo ${LANG}") }
+        it { expect(subject.stdout.strip).to eq("en_US.UTF-8") }
+      end
+      context "LC_ALL" do
+        subject { command("echo ${LC_ALL}") }
+        it { expect(subject.stdout.strip).to eq("en_US.UTF-8") }
+      end
+    end
+  end
+
   ### USERS ####################################################################
 
   describe "Users" do
