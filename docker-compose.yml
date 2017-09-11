@@ -22,8 +22,6 @@ services:
     expose:
       # Logstash TCP input
       - 5000/tcp
-      # Logstash Metrics REST Endpoint
-      - 9600/tcp
     networks:
       default:
         aliases:
