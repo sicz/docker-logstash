@@ -1,8 +1,8 @@
 ### DOCKER_IMAGE ###############################################################
 
-LOGSTASH_VERSION	?= 5.5.2
+LOGSTASH_VERSION	?= 5.6.0
 
-DOCKER_IMAGE_TAGS	?= 5.5 5 latest
+DOCKER_IMAGE_TAGS	?= 5.6 5 latest
 
 ### MK_DOCKER_IMAGE ############################################################
 
