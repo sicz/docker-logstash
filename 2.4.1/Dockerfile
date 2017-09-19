@@ -20,15 +20,18 @@ LABEL \
   org.label-schema.build-date="${BUILD_DATE}"
 
 ARG LOGSTASH_VERSION
-ENV LOGSTASH_HOME=/usr/share/logstash
-ARG LOGSTASH_TARBALL=logstash-${LOGSTASH_VERSION}.tar.gz
-ARG LOGSTASH_TARBALL_URL=https://download.elastic.co/logstash/logstash/${LOGSTASH_TARBALL}
-ARG LOGSTASH_TARBALL_SHA1_URL=${LOGSTASH_TARBALL_URL}.sha1.txt
+ARG LOGSTASH_HOME="/usr/share/logstash"
+ARG LOGSTASH_TARBALL="logstash-${LOGSTASH_VERSION}.tar.gz"
+ARG LOGSTASH_TARBALL_URL="https://download.elastic.co/logstash/logstash/${LOGSTASH_TARBALL}"
+ARG LOGSTASH_TARBALL_SHA1_URL="${LOGSTASH_TARBALL_URL}.sha1.txt"
 
 ENV \
-  DOCKER_USER=logstash \
-  DOCKER_COMMAND=logstash \
-  PATH=${LOGSTASH_HOME}/bin:${PATH}
+  DOCKER_USER="logstash" \
+  DOCKER_COMMAND="logstash" \
+  ELASTIC_CONTAINER="true" \
+  LOGSTASH_HOME="${LOGSTASH_HOME}" \
+  LOGSTASH_VERSION="${LOGSTASH_VERSION}" \
+  PATH="${LOGSTASH_HOME}/bin:${PATH}"
 
 WORKDIR ${LOGSTASH_HOME}
 
@@ -43,7 +46,7 @@ RUN set -exo pipefail; \
   mkdir -p config data logs pipeline; \
   chown -R root:root .
 
-COPY config /
-COPY ${DOCKER_IMAGE_TAG}/config /
+COPY rootfs /
+COPY ${DOCKER_IMAGE_TAG}/rootfs /
 
 CMD ["-f", "pipeline"]
