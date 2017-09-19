@@ -28,8 +28,8 @@ jobs:
           command: |
             make ci
       - run:
-          name: sicz/logstash:5.6.0
-          working_directory: 5.6.0
+          name: sicz/logstash:5.6.1
+          working_directory: 5.6.1
           command: |
             make ci
       - run:
