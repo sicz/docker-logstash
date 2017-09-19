@@ -8,7 +8,7 @@ networks:
   default:
 
 services:
-  container:
+  logstash:
     image: ${DOCKER_IMAGE}
     depends_on:
       - simple_ca
@@ -25,7 +25,7 @@ services:
     networks:
       default:
         aliases:
-          - container.local
+          - logstash.local
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - simple_ca_secrets:/run/secrets:ro
@@ -49,14 +49,14 @@ services:
     image: ${TEST_IMAGE}
     command: ${TEST_CMD}
     depends_on:
-      - container
+      - logstash
     env_file:
       - ${TEST_ENV_FILE}
     environment:
       - DOCKER_ENTRYPOINT_DEBUG=true
       - DOCKER_ENTRYPOINT_INFO=true
       # Wait until the tested container is started
-      - WAIT_FOR_TCP=container.local:5000
+      - WAIT_FOR_TCP=logstash.local:5000
       - WAIT_FOR_TIMEOUT=120
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
@@ -68,12 +68,12 @@ services:
   wait:
     image: ${TEST_IMAGE}
     depends_on:
-      - container
+      - logstash
     environment:
       - DOCKER_ENTRYPOINT_DEBUG=true
       - DOCKER_ENTRYPOINT_INFO=true
       # Wait until the tested container is started
-      - WAIT_FOR_TCP=container.local:5000
+      - WAIT_FOR_TCP=logstash.local:5000
       - WAIT_FOR_TIMEOUT=120
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro

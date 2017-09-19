@@ -81,18 +81,18 @@ describe "Docker container", :test => :docker_container do
   #   before(:each)  { set :backend, :exec }
   #   [
   #     # [url, stdout, stderr]
-  #     [ "http://#{ENV["SERVICE_NAME"]}.local",
+  #     [ "http://#{ENV["SERVER_CRT_HOST"]}",
   #       "^#{IO.binread("spec/fixtures/www/index.html")}$",
-  #       "\\r\\n< HTTP/1.1 301 Moved Permanently\\r\\n< Location: https://#{ENV["SERVICE_NAME"]}.local/\\r\\n",
+  #       "\\r\\n< HTTP/1.1 301 Moved Permanently\\r\\n< Location: https://#{ENV["SERVER_CRT_HOST"]}/\\r\\n",
   #     ],
-  #     [ "http://#{ENV["SERVICE_NAME"]}.local/index.html",
+  #     [ "http://#{ENV["SERVER_CRT_HOST"]}/index.html",
   #       "^#{IO.binread("spec/fixtures/www/index.html")}$",
-  #       "\\r\\n< HTTP/1.1 301 Moved Permanently\\r\\n< Location: https://#{ENV["SERVICE_NAME"]}.local/index.html\\r\\n",
+  #       "\\r\\n< HTTP/1.1 301 Moved Permanently\\r\\n< Location: https://#{ENV["SERVER_CRT_HOST"]}/index.html\\r\\n",
   #     ],
-  #     [ "https://#{ENV["SERVICE_NAME"]}.local",
+  #     [ "https://#{ENV["SERVER_CRT_HOST"]}",
   #       "^#{IO.binread("spec/fixtures/www/index.html")}$",
   #     ],
-  #     [ "https://#{ENV["SERVICE_NAME"]}.local/index.html",
+  #     [ "https://#{ENV["SERVER_CRT_HOST"]}/index.html",
   #       "^#{IO.binread("spec/fixtures/www/index.html")}$",
   #     ],
   #   ].each do |url, stdout, stderr|
