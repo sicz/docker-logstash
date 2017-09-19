@@ -39,12 +39,13 @@ SERVER_CRT_HOST		+= $(SERVICE_NAME).local
 DOCKER_IMAGE_DEPENDENCIES += $(SIMPLE_CA_IMAGE)
 
 # Simple CA image
-SIMPLE_CA_IMAGE_NAME	?= sicz/simple-ca
+SIMPLE_CA_NAME		?= simple-ca
+SIMPLE_CA_IMAGE_NAME	?= $(DOCKER_PROJECT)/$(SIMPLE_CA_NAME)
 SIMPLE_CA_IMAGE_TAG	?= latest
 SIMPLE_CA_IMAGE		?= $(SIMPLE_CA_IMAGE_NAME):$(SIMPLE_CA_IMAGE_TAG)
 
-# Simple CA service name in the Docker Compose file
-SIMPLE_CA_SERVICE_NAME	?= $(shell echo $(SIMPLE_CA_IMAGE_NAME) | sed -E -e "s|^.*/||" -e "s/[^[:alnum:]_]+/_/g")
+# Simple CA service name in Docker Compose file
+SIMPLE_CA_SERVICE_NAME	?= $(shell echo $(SIMPLE_CA_NAME) | sed -E -e "s/[^[:alnum:]_]+/_/g")
 
 # Simple CA container name
 ifeq ($(DOCKER_EXECUTOR),container)
