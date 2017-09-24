@@ -8,20 +8,14 @@ jobs:
       - RSPEC_FORMAT=doc
     steps:
       - checkout
-      - setup_remote_docker:
-          version: 17.06.0-ce
-      - run:
-          name: Remote Docker engine version and images
-          command: |
-            docker --version
-            docker-compose --version
-            docker image ls
       - run:
           name: Checkout make files
           command: |
             cd ..
             curl -sSL https://github.com/SICZ/Mk/archive/master.tar.gz | tar -xzf -
             mv Mk-master Mk
+      - setup_remote_docker:
+          version: 17.06.0-ce
       - run:
           name: sicz/logstash:2.4.1
           working_directory: 2.4.1
