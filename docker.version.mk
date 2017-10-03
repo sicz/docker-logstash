@@ -5,29 +5,43 @@ BASE_IMAGE_TAG		?= 8u144-jre-centos
 
 ### DOCKER_IMAGE ###############################################################
 
+LOGSTASH_TAG		?= $(LOGSTASH_VERSION)
+
 DOCKER_PROJECT		?= sicz
 DOCKER_PROJECT_DESC	?= An advanced open source ETL processor
 DOCKER_PROJECT_URL	?= https://www.elastic.co/products/logstash
 
 DOCKER_NAME		?= logstash
-DOCKER_IMAGE_TAG	?= $(LOGSTASH_VERSION)
+DOCKER_IMAGE_TAG	?= $(LOGSTASH_TAG)
 
 ### BUILD ######################################################################
 
 # Docker image build variables
-BUILD_VARS		+= LOGSTASH_VERSION
+BUILD_VARS		+= LOGSTASH_VERSION \
+			   LOGSTASH_TAG
 
-### DOCKER_EXECUTOR ############################################################
+### EXECUTOR ###################################################################
 
 # Use the Docker Compose executor
 DOCKER_EXECUTOR		?= compose
 
 # Variables used in the Docker Compose file
-COMPOSE_VARS		+= SERVER_CRT_HOST \
+COMPOSE_VARS		+= ELASTICSEARCH_IMAGE \
+			   SERVER_CRT_HOST \
 			   SIMPLE_CA_IMAGE
 
 # Certificate subject aletrnative names
 SERVER_CRT_HOST		+= $(SERVICE_NAME).local
+
+### ELASTICSEARCH ##############################################################
+
+# Docker image dependencies
+DOCKER_IMAGE_DEPENDENCIES += $(ELASTICSEARCH_IMAGE)
+
+# Elasticsearch image
+ELASTICSEARCH_IMAGE_NAME ?= $(DOCKER_PROJECT)/elasticsearch
+ELASTICSEARCH_IMAGE_TAG	?= $(LOGSTASH_TAG)-x-pack
+ELASTICSEARCH_IMAGE	?= $(ELASTICSEARCH_IMAGE_NAME):$(ELASTICSEARCH_IMAGE_TAG)
 
 ### SIMPLE_CA ##################################################################
 
@@ -35,41 +49,30 @@ SERVER_CRT_HOST		+= $(SERVICE_NAME).local
 DOCKER_IMAGE_DEPENDENCIES += $(SIMPLE_CA_IMAGE)
 
 # Simple CA image
-SIMPLE_CA_NAME		?= simple-ca
-SIMPLE_CA_IMAGE_NAME	?= $(DOCKER_PROJECT)/$(SIMPLE_CA_NAME)
+SIMPLE_CA_IMAGE_NAME	?= $(DOCKER_PROJECT)/simple-ca
 SIMPLE_CA_IMAGE_TAG	?= latest
 SIMPLE_CA_IMAGE		?= $(SIMPLE_CA_IMAGE_NAME):$(SIMPLE_CA_IMAGE_TAG)
-
-# Simple CA service name in Docker Compose file
-SIMPLE_CA_SERVICE_NAME	?= $(shell echo $(SIMPLE_CA_NAME) | sed -E -e "s/[^[:alnum:]_]+/_/g")
-
-# Simple CA container name
-ifeq ($(DOCKER_EXECUTOR),container)
-SIMPLE_CA_CONTAINER_NAME ?= $(DOCKER_EXECUTOR_ID)_$(SIMPLE_CA_SERVICE_NAME)
-else ifeq ($(DOCKER_EXECUTOR),compose)
-SIMPLE_CA_CONTAINER_NAME ?= $(DOCKER_EXECUTOR_ID)_$(SIMPLE_CA_SERVICE_NAME)_1
-else ifeq ($(DOCKER_EXECUTOR),stack)
-# TODO: Docker Swarm Stack executor
-SIMPLE_CA_CONTAINER_NAME ?= $(DOCKER_EXECUTOR_ID)_$(SIMPLE_CA_SERVICE_NAME)_1
-else
-$(error Unknown Docker executor "$(DOCKER_EXECUTOR)")
-endif
 
 ### MAKE_VARS ##################################################################
 
 # Display the make variables
 MAKE_VARS		?= GITHUB_MAKE_VARS \
+			   CONFIG_MAKE_VARS \
 			   BASE_IMAGE_MAKE_VARS \
 			   DOCKER_IMAGE_MAKE_VARS \
 			   BUILD_MAKE_VARS \
 			   EXECUTOR_MAKE_VARS \
-			   CONFIG_MAKE_VARS \
 			   SHELL_MAKE_VARS \
 			   DOCKER_REGISTRY_MAKE_VARS
 
 
 define CONFIG_MAKE_VARS
-LOGSTAH_VERSION:	$(LOGSTAH_VERSION)
+LOGSTASH_VERSION:	$(LOGSTASH_VERSION)
+LOGSTASH_TAG:		$(LOGSTASH_TAG)
+
+ELASTICSEARCH_IMAGE_NAME: $(ELASTICSEARCH_IMAGE_NAME)
+ELASTICSEARCH_IMAGE_TAG: $(ELASTICSEARCH_IMAGE_TAG)
+ELASTICSEARCH_IMAGE:	$(ELASTICSEARCH_IMAGE)
 
 SIMPLE_CA_IMAGE_NAME:	$(SIMPLE_CA_IMAGE_NAME)
 SIMPLE_CA_IMAGE_TAG:	$(SIMPLE_CA_IMAGE_TAG)
@@ -119,8 +122,8 @@ run up: docker-up
 create: docker-create .docker-$(DOCKER_EXECUTOR)-create-logstash
 
 .docker-$(DOCKER_EXECUTOR)-create-logstash:
-	@$(ECHO) "Copying spec/fixtures/logstash to $(CONTAINER_NAME):/usr/share"
-	@docker cp $(TEST_DIR)/spec/fixtures/logstash $(CONTAINER_NAME):/usr/share
+	@$(ECHO) "Copying spec/fixtures/logstash/pipeline to $(CONTAINER_NAME):/usr/share/logstash"
+	@docker cp $(TEST_DIR)/spec/fixtures/logstash/pipeline $(CONTAINER_NAME):/usr/share/logstash
 	@$(ECHO) $(CONTAINER_NAME) > $@
 
 # Start the containers

@@ -1,0 +1,30 @@
+###
+### Default configuration
+###
+
+version: "3.3"
+
+services:
+  logstash:
+    depends_on:
+      - elasticsearch
+    environment:
+      - ELASTICSEARCH_URL=http://elasticsearch.local:9200
+      - WAIT_FOR_URL=http://elasticsearch.local:9200
+
+  elasticsearch:
+    image: ${ELASTICSEARCH_IMAGE}
+    environment:
+      - DOCKER_ENTRYPOINT_DEBUG=true
+      - DOCKER_ENTRYPOINT_INFO=true
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      - discovery.type=single-node
+    expose:
+      - 9200/tcp
+      - 9300/tcp
+    networks:
+      default:
+        aliases:
+          - elasticsearch.local
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro

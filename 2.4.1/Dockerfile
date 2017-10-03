@@ -20,33 +20,31 @@ LABEL \
   org.label-schema.build-date="${BUILD_DATE}"
 
 ARG LOGSTASH_VERSION
-ARG LOGSTASH_HOME="/usr/share/logstash"
 ARG LOGSTASH_TARBALL="logstash-${LOGSTASH_VERSION}.tar.gz"
 ARG LOGSTASH_TARBALL_URL="https://download.elastic.co/logstash/logstash/${LOGSTASH_TARBALL}"
 ARG LOGSTASH_TARBALL_SHA1_URL="${LOGSTASH_TARBALL_URL}.sha1.txt"
+ARG LS_HOME="/usr/share/logstash"
 
 ENV \
   DOCKER_USER="logstash" \
   DOCKER_COMMAND="logstash" \
   ELASTIC_CONTAINER="true" \
-  LOGSTASH_HOME="${LOGSTASH_HOME}" \
   LOGSTASH_VERSION="${LOGSTASH_VERSION}" \
-  PATH="${LOGSTASH_HOME}/bin:${PATH}"
+  LS_HOME="${LS_HOME}" \
+  PATH="${LS_HOME}/bin:${PATH}"
 
-WORKDIR ${LOGSTASH_HOME}
+WORKDIR ${LS_HOME}
 
 RUN set -exo pipefail; \
-  adduser --uid 1000 --user-group --home-dir ${LOGSTASH_HOME} ${DOCKER_USER}; \
+  adduser --uid 1000 --user-group --home-dir ${LS_HOME} ${DOCKER_USER}; \
   curl -fLo /tmp/${LOGSTASH_TARBALL} ${LOGSTASH_TARBALL_URL}; \
-  EXPECTED_SHA1=$(curl -fL ${LOGSTASH_TARBALL_SHA1_URL} | cut -d ' ' -f 1); \
-  TARBALL_SHA1=$(sha1sum /tmp/${LOGSTASH_TARBALL} | cut -d ' ' -f 1); \
+  EXPECTED_SHA1=$(curl -fL ${LOGSTASH_TARBALL_SHA1_URL} | cut -d " " -f 1); \
+  TARBALL_SHA1=$(sha1sum /tmp/${LOGSTASH_TARBALL} | cut -d " " -f 1); \
   [ "${TARBALL_SHA1}" = "${EXPECTED_SHA1}" ]; \
   tar xz --strip-components=1 -f /tmp/${LOGSTASH_TARBALL}; \
   rm -f /tmp/${LOGSTASH_TARBALL}; \
-  mkdir -p config data logs pipeline; \
   chown -R root:root .
 
 COPY rootfs /
-COPY ${DOCKER_IMAGE_TAG}/rootfs /
 
-CMD ["-f", "pipeline"]
+CMD ["-f", "${LS_PATH_CONF}"]

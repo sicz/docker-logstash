@@ -1,8 +1,17 @@
 ### DOCKER_IMAGE ###############################################################
 
-LOGSTASH_VERSION	?= 5.6.1
+LOGSTASH_VERSION	?= 5.6.2
 
-DOCKER_IMAGE_TAGS	?= 5.6 5 latest
+### BUILD ######################################################################
+
+BUILD_VARS		+= CHECKSUM
+
+CHECKSUM		?= sha1
+
+### TEST #######################################################################
+
+# Skip Elasticsearch X-Pack tests
+SPEC_OPTS		?= --tag ~x_pack
 
 ### MK_DOCKER_IMAGE ############################################################
 

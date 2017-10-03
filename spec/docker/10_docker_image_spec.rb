@@ -113,20 +113,82 @@ describe "Docker image", :test => :docker_image do
 
   describe "Files" do
     [
-      # [file,                                            mode, user,       group,      [expectations], localdir]
-      ["/docker-entrypoint.sh",                           755, "root",      "root",     [:be_file]],
-      ["/docker-entrypoint.d/30-environment-logstash.sh", 644, "root",      "root",     [:be_file, :eq_sha256sum]],
-      ["/docker-entrypoint.d/31-environment-xpack.sh",    644, "root",      "root",     [:be_file, :eq_sha256sum], ENV["DOCKER_IMAGE_TAG"]],
-      ["/docker-entrypoint.d/60-logstash-settings.sh",    644, "root",      "root",     [:be_file, :eq_sha256sum]],
-      ["/usr/share/logstash",                             755, "root",      "root",     [:be_directory]],
-      ["/usr/share/logstash/bin",                         755, "root",      "root",     [:be_directory]],
-      ["/usr/share/logstash/config",                      750, "logstash",  "logstash", [:be_directory]],
-      ["/usr/share/logstash/data",                        750, "logstash",  "logstash", [:be_directory]],
-      ["/usr/share/logstash/logs",                        750, "logstash",  "logstash", [:be_directory]],
-      ["/usr/share/logstash/pipeline",                    750, "logstash",  "logstash", [:be_directory]],
-    ].each do |file, mode, user, group, expectations, localdir|
+      # [
+      #   file,
+      #   mode, user, group, [expectations],
+      #   rootfs, srcfile,
+      #   sha256sum,
+      # ]
+      [
+        "/docker-entrypoint.sh",
+        755, "root", "root", [:be_file],
+      ],
+      [
+        "/docker-entrypoint.d/30-logstash-environment.sh",
+        644, "root", "root", [:be_file, :eq_sha256sum],
+      ],
+      [
+        "/docker-entrypoint.d/60-logstash-fragments.sh",
+        644, "root", "root", [:be_file, :eq_sha256sum],
+      ],
+      [
+        "/docker-entrypoint.d/70-logstash-settings.sh",
+        644, "root", "root", [:be_file, :eq_sha256sum],
+      ],
+      [
+        "/docker-entrypoint.d/80-logstash-opts.sh",
+        644, "root", "root", [:be_file, :eq_sha256sum],
+      ],
+      [
+        "/usr/share/logstash",
+        755, "root", "root", [:be_directory],
+      ],
+      [
+        "/usr/share/logstash/bin",
+        755, "root", "root", [:be_directory],
+      ],
+      [
+        "/usr/share/logstash/config",
+        750, "logstash", "logstash", [:be_directory],
+      ],
+      [
+        "/usr/share/logstash/config/logstash.docker.yml",
+        640, "logstash", "logstash", [:be_file],
+      ],
+      [
+        "/usr/share/logstash/config/logstash.yml",
+        640, "logstash", "logstash", [:be_file],
+      ],
+      [
+        "/usr/share/logstash/config/log4j2.docker.properties",
+        640, "logstash", "logstash", [:be_file, :eq_sha256sum],
+      ],
+      [
+        "/usr/share/logstash/config/log4j2.properties",
+        640, "logstash", "logstash", [:be_file, :eq_sha256sum],
+        nil, nil,
+        Digest::SHA256.hexdigest(
+          "# log4j2.docker.properties\n" +
+          IO.binread("rootfs/usr/share/logstash/config/log4j2.docker.properties")
+        ),
+      ],
+      [
+        "/usr/share/logstash/data",
+        750, "logstash", "logstash", [:be_directory],
+      ],
+      [
+        "/usr/share/logstash/logs",
+        750, "logstash", "logstash", [:be_directory],
+      ],
+      [
+        "/usr/share/logstash/pipeline",
+        750, "logstash", "logstash", [:be_directory]
+      ],
+    ].each do |file, mode, user, group, expectations, rootfs, srcfile, sha256sum|
       expectations ||= []
-      localdir = "." if localdir.nil?
+      rootfs = "rootfs" if rootfs.nil?
+      srcfile = file if srcfile.nil?
+      sha256sum = Digest::SHA256.file("#{rootfs}/#{srcfile}").to_s if expectations.include?(:eq_sha256sum) && sha256sum.nil?
       context file(file) do
         it { is_expected.to exist }
         it { is_expected.to be_file }       if expectations.include?(:be_file)
@@ -134,11 +196,7 @@ describe "Docker image", :test => :docker_image do
         it { is_expected.to be_mode(mode) } unless mode.nil?
         it { is_expected.to be_owned_by(user) } unless user.nil?
         it { is_expected.to be_grouped_into(group) } unless group.nil?
-        its(:sha256sum) do
-          is_expected.to eq(
-              Digest::SHA256.file("#{localdir}/rootfs/#{subject.name}").to_s
-          )
-        end if expectations.include?(:eq_sha256sum)
+        its(:sha256sum) { is_expected.to eq(sha256sum) } if expectations.include?(:eq_sha256sum)
       end
     end
   end

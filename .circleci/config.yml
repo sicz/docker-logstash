@@ -22,13 +22,23 @@ jobs:
           command: |
             make ci
       - run:
-          name: sicz/logstash:5.6.1
-          working_directory: 5.6.1
+          name: sicz/logstash:5.6.2
+          working_directory: 5.6.2
+          command: |
+            make ci
+      - run:
+          name: sicz/logstash:5.6.2-x-pack
+          working_directory: 5.6.2/x-pack
           command: |
             make ci
       - run:
           name: sicz/logstash:6.0.0
           working_directory: 6.0.0
+          command: |
+            make ci
+      - run:
+          name: sicz/logstash:6.0.0-x-pack
+          working_directory: 6.0.0/x-pack
           command: |
             make ci
       - deploy:

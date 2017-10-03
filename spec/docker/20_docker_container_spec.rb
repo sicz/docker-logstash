@@ -14,32 +14,6 @@ describe "Docker container", :test => :docker_container do
     it { is_expected.to be_running }
   end
 
-  ### FILES ####################################################################
-
-  describe "Files" do
-    [
-      # [file,                                            mode, user,       group,      [expectations]]
-      ["/usr/share/logstash/config/logstash.yml",         640, "logstash",  "logstash", [:be_file]],
-      ["/usr/share/logstash/config/log4j2.properties",    640, "logstash",  "logstash", [:be_file]],
-      ["/usr/share/logstash/pipeline/logstash.conf",      640, "logstash",  "logstash", [:be_file]],
-    ].each do |file, mode, user, group, expectations|
-      expectations ||= []
-      context file(file) do
-        it { is_expected.to exist }
-        it { is_expected.to be_file }       if expectations.include?(:be_file)
-        it { is_expected.to be_directory }  if expectations.include?(:be_directory)
-        it { is_expected.to be_mode(mode) } unless mode.nil?
-        it { is_expected.to be_owned_by(user) } unless user.nil?
-        it { is_expected.to be_grouped_into(group) } unless group.nil?
-        its(:sha256sum) do
-          is_expected.to eq(
-              Digest::SHA256.file("config/#{subject.name}").to_s
-          )
-        end if expectations.include?(:eq_sha256sum)
-      end
-    end
-  end
-
   ### PROCESSES ################################################################
 
   describe "Processes" do
@@ -77,7 +51,7 @@ describe "Docker container", :test => :docker_container do
   # https://www.elastic.co/guide/en/logstash/current/monitoring-logstash.html#monitoring
 
   # describe "URLs" do
-  #   # Execute Serverspec command locally
+  #   # Execute Serverspec commands locally
   #   before(:each)  { set :backend, :exec }
   #   [
   #     # [url, stdout, stderr]
