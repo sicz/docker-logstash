@@ -1,24 +1,20 @@
 ### BASE_IMAGE #################################################################
 
 BASE_IMAGE_NAME		?= $(DOCKER_IMAGE_NAME)
-BASE_IMAGE_TAG		?= $(LOGSTASH_TAG)
+BASE_IMAGE_TAG		?= $(LOGSTASH_TAG)-x-pack
 
 ### DOCKER_IMAGE ###############################################################
 
-DOCKER_IMAGE_TAG	?= $(LOGSTASH_TAG)-x-pack
+DOCKER_IMAGE_TAG	?= $(LOGSTASH_TAG)-dev
 
 ### BUILD ######################################################################
 
-VARIANT_DIR		?= $(PROJECT_DIR)/x-pack
-
-### EXECUTOR ###################################################################
-
-DOCKER_CONFIG		?= x-pack-5
+VARIANT_DIR		?= $(PROJECT_DIR)/dev
 
 ### TEST #######################################################################
 
-# Skip dev tests
-SPEC_OPTS		?= --tag ~dev
+# Skip X-Pack tests
+SPEC_OPTS		?= --tag ~x_pack
 
 ### MK_DOCKER_IMAGE ############################################################
 

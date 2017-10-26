@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-### LOGSTASH_YML ###############################################################
+### LOGSTASH_DOCKER_YML ########################################################
 
 if [ ! -e ${LS_SETTINGS_DIR}/logstash.docker.yml ]; then
   info "Creating ${LS_SETTINGS_DIR}/logstash.docker.yml"
@@ -8,6 +8,11 @@ if [ ! -e ${LS_SETTINGS_DIR}/logstash.docker.yml ]; then
     echo "node.name: ${LS_NODE_NAME}"
     echo "path.data: ${LS_PATH_DATA}"
     echo "path.logs: ${LS_PATH_LOGS}"
+    while IFS="=" read -r KEY VAL; do
+      if [ ! -z "${VAL}" ]; then
+        echo "${KEY}: ${VAL}"
+      fi
+    done < <(env | egrep "^[a-z_]+\.[a-z_]+" | sort)
   ) > ${LS_SETTINGS_DIR}/logstash.docker.yml
 fi
 

@@ -41,6 +41,11 @@ jobs:
           working_directory: 6.0.0/x-pack
           command: |
             make ci
+      - run:
+          name: sicz/logstash:6.0.0-dev
+          working_directory: 6.0.0/dev
+          command: |
+            make ci
       - deploy:
           name: Push images to the Docker Hub
           command: |

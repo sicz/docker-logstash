@@ -50,40 +50,30 @@ describe "Docker container", :test => :docker_container do
   # TODO: Logstash monitoring API:
   # https://www.elastic.co/guide/en/logstash/current/monitoring-logstash.html#monitoring
 
-  # describe "URLs" do
-  #   # Execute Serverspec commands locally
-  #   before(:each)  { set :backend, :exec }
-  #   [
-  #     # [url, stdout, stderr]
-  #     [ "http://#{ENV["SERVER_CRT_HOST"]}",
-  #       "^#{IO.binread("spec/fixtures/www/index.html")}$",
-  #       "\\r\\n< HTTP/1.1 301 Moved Permanently\\r\\n< Location: https://#{ENV["SERVER_CRT_HOST"]}/\\r\\n",
-  #     ],
-  #     [ "http://#{ENV["SERVER_CRT_HOST"]}/index.html",
-  #       "^#{IO.binread("spec/fixtures/www/index.html")}$",
-  #       "\\r\\n< HTTP/1.1 301 Moved Permanently\\r\\n< Location: https://#{ENV["SERVER_CRT_HOST"]}/index.html\\r\\n",
-  #     ],
-  #     [ "https://#{ENV["SERVER_CRT_HOST"]}",
-  #       "^#{IO.binread("spec/fixtures/www/index.html")}$",
-  #     ],
-  #     [ "https://#{ENV["SERVER_CRT_HOST"]}/index.html",
-  #       "^#{IO.binread("spec/fixtures/www/index.html")}$",
-  #     ],
-  #   ].each do |url, stdout, stderr|
-  #     context url do
-  #       subject { command("curl --location --silent --show-error --verbose #{url}") }
-  #       it "should exist" do
-  #         expect(subject.exit_status).to eq(0)
-  #       end
-  #       it "should match \"#{stdout.gsub(/\n/, "\\n")}\"" do
-  #         expect(subject.stdout).to match(stdout)
-  #       end unless stdout.nil?
-  #       it "should match \"#{stderr}\"" do
-  #         expect(subject.stderr).to match(stderr)
-  #       end unless stderr.nil?
-  #     end
-  #   end
-  # end
+  describe "Logstash endpoint" do
+    # Execute Serverspec commands locally
+    before(:each)  { set :backend, :exec }
+    [
+      # [
+      #   url,
+      #   stdout,
+      #   stderr,
+      #   curl_opts
+      # ]
+      [ "https://#{ENV["SERVER_CRT_HOST"]}:5000",
+        nil,
+        "^< HTTP/1.1 200 OK\\r$",
+        "-XPUT -H 'content-type: text/plain' -d 'message 1'"
+      ],
+    ].each do |url, stdout, stderr, curl_opts|
+      context url do
+        subject { command("curl #{curl_opts} --location --silent --show-error --verbose #{url}") }
+        its(:exit_status) { is_expected.to eq(0) }
+        its(:stdout) { is_expected.to match(/#{stdout}/) } unless stdout.nil?
+        its(:stderr) { is_expected.to match(/#{stderr}/) } unless stderr.nil?
+      end
+    end
+  end
 
   ##############################################################################
 

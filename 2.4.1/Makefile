@@ -6,10 +6,18 @@ LOGSTASH_VERSION	?= 2.4.1
 
 VARIANT_DIR		?= $(CURDIR)
 
+### EXECUTOR ###################################################################
+
+DOCKER_CONFIG		?= logstash-2
+
+### ELASTICSEARCH ##############################################################
+
+ELASTICSEARCH_IMAGE_TAG	?= 2.4.5
+
 ### TEST #######################################################################
 
-# Skip Elasticsearch X-Pack tests
-SPEC_OPTS		?= --tag ~x_pack
+# Skip X-Pack and dev tests
+SPEC_OPTS		?= --tag ~x_pack --tag ~dev
 
 ### MK_DOCKER_IMAGE ############################################################
 

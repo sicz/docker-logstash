@@ -46,5 +46,3 @@ RUN set -exo pipefail; \
   chown -R root:root .
 
 COPY rootfs /
-
-CMD ["-f", "${LS_PATH_CONF}"]

@@ -1,7 +1,10 @@
 ### BASE_IMAGE #################################################################
 
+OPENJDK_PRODUCT_VERSION	?= 8
+OPENJDK_UPDATE_VERSION	?= 144
+
 BASE_IMAGE_NAME		?= $(DOCKER_PROJECT)/openjdk
-BASE_IMAGE_TAG		?= 8u144-jre-centos
+BASE_IMAGE_TAG		?= $(OPENJDK_PRODUCT_VERSION)u$(OPENJDK_UPDATE_VERSION)-jre-centos
 
 ### DOCKER_IMAGE ###############################################################
 
@@ -17,8 +20,7 @@ DOCKER_IMAGE_TAG	?= $(LOGSTASH_TAG)
 ### BUILD ######################################################################
 
 # Docker image build variables
-BUILD_VARS		+= LOGSTASH_VERSION \
-			   LOGSTASH_TAG
+BUILD_VARS		+= LOGSTASH_VERSION
 
 ### EXECUTOR ###################################################################
 
@@ -33,6 +35,11 @@ COMPOSE_VARS		+= ELASTICSEARCH_IMAGE \
 # Certificate subject aletrnative names
 SERVER_CRT_HOST		+= $(SERVICE_NAME).local
 
+### TEST #######################################################################
+
+TEST_VARS		+= OPENJDK_PRODUCT_VERSION \
+			   OPENJDK_UPDATE_VERSION
+
 ### ELASTICSEARCH ##############################################################
 
 # Docker image dependencies
@@ -40,7 +47,7 @@ DOCKER_IMAGE_DEPENDENCIES += $(ELASTICSEARCH_IMAGE)
 
 # Elasticsearch image
 ELASTICSEARCH_IMAGE_NAME ?= $(DOCKER_PROJECT)/elasticsearch
-ELASTICSEARCH_IMAGE_TAG	?= $(LOGSTASH_TAG)-x-pack
+ELASTICSEARCH_IMAGE_TAG	?= $(DOCKER_IMAGE_TAG)
 ELASTICSEARCH_IMAGE	?= $(ELASTICSEARCH_IMAGE_NAME):$(ELASTICSEARCH_IMAGE_TAG)
 
 ### SIMPLE_CA ##################################################################
@@ -119,12 +126,7 @@ run up: docker-up
 
 # Create the containers
 .PHONY: create
-create: docker-create .docker-$(DOCKER_EXECUTOR)-create-logstash
-
-.docker-$(DOCKER_EXECUTOR)-create-logstash:
-	@$(ECHO) "Copying spec/fixtures/logstash/pipeline to $(CONTAINER_NAME):/usr/share/logstash"
-	@docker cp $(TEST_DIR)/spec/fixtures/logstash/pipeline $(CONTAINER_NAME):/usr/share/logstash
-	@$(ECHO) $(CONTAINER_NAME) > $@
+create: docker-create
 
 # Start the containers
 .PHONY: start

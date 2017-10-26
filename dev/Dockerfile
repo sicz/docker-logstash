@@ -19,7 +19,22 @@ LABEL \
   org.label-schema.vcs-ref="${VCS_REF}" \
   org.label-schema.build-date="${BUILD_DATE}"
 
-RUN set -exo pipefail; \
-  logstash-plugin install x-pack
+ENV JRUBY_HOME=${LS_HOME}/vendor/jruby
+ENV PATH=${JRUBY_HOME}/bin:${PATH}
 
-COPY x-pack/rootfs /
+RUN set -exo pipefail; \
+# Install the packages
+yum install -y \
+  gcc \
+  git \
+  "java-1.${OPENJDK_PRODUCT_VERSION}.0-openjdk-devel-1:1.${OPENJDK_PRODUCT_VERSION}.0.${OPENJDK_UPDATE_VERSION}-*" \
+  make \
+  vim-enhanced \
+  ; \
+# Cleanup yum
+yum clean all; \
+# Install Ruby packages
+gem install \
+  bundler \
+  rake \
+  rspec

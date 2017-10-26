@@ -6,10 +6,10 @@ if [ -n "${DOCKER_CONTAINER_START}" ]; then
   declare -a LS_OPTS
   while IFS="=" read -r KEY VAL; do
     if [ ! -z "${VAL}" ]; then
-      LS_OPTS+=("--${KEY}=${VAL}")
+      LS_OPTS+=("--${KEY} ${VAL}")
     fi
   done < <(env | egrep "^[a-z_]+\.[a-z_]+" | egrep -v "^xpack\." | sort)
-  set -- $@ ${LS_OPTS[@]}
+  set -- "$@" ${LS_OPTS[@]}
   unset LS_OPTS
 fi
 

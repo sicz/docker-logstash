@@ -10,7 +10,7 @@ ETL processor.
 
 ## Contents
 
-This container only contains essential components:
+This images only contains essential components:
 * [sicz/openjdk:8-jre-centos](https://github.com/sicz/docker-openjdk)
   as a base image.
 * [Logstash](https://www.elastic.co/products/logstash) is an advanced
@@ -34,9 +34,9 @@ git clone https://github.com/sicz/docker-logstash
 ### Usage
 
 The project contains Docker image version directories:
-* `2.4.1` - Logstash 2.4.1
-* `5.5.2` - Logstash 5.5.2
-* `6.0.0` - Logstash 6.0.0
+* `x.y.z` - Logstash
+* `x.y.z/x-pack` - Logstash with X-Pack plugin
+* `x.y.z/dev` - Logstash with X-Pack plugin, Java JDK and Ruby development tools
 
 Use the command `make` in the project directory:
 ```bash
@@ -80,8 +80,8 @@ make docker-pull-testimage # Pull the test image from the Docker Registry
 make docker-push        # Push the project image into the Docker Registry
 ```
 
-`logstash` with the default configuration listens on TCP port 5000 and save
-incoming events into file `/usr/share/logstash/data/events.json`.
+The `logstash` container requires a pipeline configuration, otherwise it can not
+be run.
 
 ## Deployment
 
@@ -90,10 +90,16 @@ You can start with this sample `docker-compose.yml` file:
 services:
   logstash:
     image: sicz/logstash
+    command: -f pipeline
     ports:
-      - 5000:5000
+      - 514:514/udp
+      - 514:514/tcp
+      - 5044:5044/tcp
     volumes:
       - ./config:/usr/share/logstash/pipeline
+      - logstash_data:/usr/share/logstash/data
+volumes:
+  logstash_data:
 ```
 
 ## Authors

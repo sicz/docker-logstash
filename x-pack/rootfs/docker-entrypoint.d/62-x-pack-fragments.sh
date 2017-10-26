@@ -2,10 +2,10 @@
 
 ### LOGSTASH_YML ###############################################################
 
-if [ ! -e ${LS_SETTINGS_DIR}/logstash.x-pack.docker.yml ]; then
+if [ ! -e ${LS_SETTINGS_DIR}/logstash.x-pack.yml ]; then
   (
     # X-Pack Monitoring settings
-    if [ "${XPACK_MONITORING_ENABLED}" = "true" -a -n "${XPACK_MONITORING_ELASTICSEARCH_URL}" ]; then
+    if [ "${XPACK_MONITORING_ENABLED}" = "true" ]; then
       echo "xpack.monitoring.enabled: ${XPACK_MONITORING_ENABLED}"
       echo "xpack.monitoring.elasticsearch.url: ${XPACK_MONITORING_ELASTICSEARCH_URL}"
       if [ -n "${XPACK_MONITORING_ELASTICSEARCH_USERNAME}" -a -n "${XPACK_MONITORING_ELASTICSEARCH_PASSWORD}" ]; then
@@ -22,11 +22,13 @@ if [ ! -e ${LS_SETTINGS_DIR}/logstash.x-pack.docker.yml ]; then
           echo "xpack.monitoring.elasticsearch.ssl.keystore.password: ${JAVA_KEYSTORE_PWD}"
         fi
       fi
+      WAIT_FOR_DNS="${WAIT_FOR_DNS} ${XPACK_MANAGEMENT_ELASTICSEARCH_URL}"
     else
       echo "xpack.monitoring.enabled: false"
     fi
+
     # X-Pack Management settings
-    if [ "${XPACK_MANAGEMENT_ENABLED}" = "true" -a -n "${XPACK_MANAGEMENT_ELASTICSEARCH_URL}" ]; then
+    if [ "${XPACK_MANAGEMENT_ENABLED}" = "true" ]; then
       echo "xpack.management.enabled: ${XPACK_MANAGEMENT_ENABLED}"
       echo "xpack.management.elasticsearch.url: ${XPACK_MANAGEMENT_ELASTICSEARCH_URL}"
       if [ -n "${XPACK_MANAGEMENT_ELASTICSEARCH_USERNAME}" -a -n "${XPACK_MANAGEMENT_ELASTICSEARCH_PASSWORD}" ]; then
@@ -43,8 +45,9 @@ if [ ! -e ${LS_SETTINGS_DIR}/logstash.x-pack.docker.yml ]; then
           echo "xpack.management.elasticsearch.ssl.keystore.password: ${JAVA_KEYSTORE_PWD}"
         fi
       fi
+      WAIT_FOR_DNS="${WAIT_FOR_DNS} ${XPACK_MANAGEMENT_ELASTICSEARCH_URL}"
     else
-      # TODO: Logstash 5 X-Pack does not support X-Pack Management
+      # TODO: Logstash 5.x X-Pack does not support X-Pack Management settings
       if [ "$(echo ${LOGSTASH_VERSION} | sed -E "s/\..*//")" != "5" ]; then
         echo "xpack.management.enabled: false"
       fi
@@ -55,9 +58,9 @@ if [ ! -e ${LS_SETTINGS_DIR}/logstash.x-pack.docker.yml ]; then
         echo "${KEY}: ${VAL}"
       fi
     done < <(env | egrep "^xpack\.[a-z_]+" | sort)
-  ) > ${LS_SETTINGS_DIR}/logstash.x-pack.docker.yml
+  ) > ${LS_SETTINGS_DIR}/logstash.x-pack.yml
 fi
 
-LOGSTASH_YML_FILES="${LOGSTASH_YML_FILES} logstash.x-pack.docker.yml"
+LOGSTASH_YML_FILES="${LOGSTASH_YML_FILES} logstash.x-pack.yml"
 
 ################################################################################

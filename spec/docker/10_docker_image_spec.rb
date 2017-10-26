@@ -75,6 +75,30 @@ describe "Docker image", :test => :docker_image do
     [
       # [package,                   version,                    installer]
       "bash",
+      "java-1.#{ENV["OPENJDK_PRODUCT_VERSION"]}.0-openjdk-headless",
+    ].each do |package, version, installer|
+      describe package(package) do
+        it { is_expected.to be_installed }                        if installer.nil? && version.nil?
+        it { is_expected.to be_installed.with_version(version) }  if installer.nil? && ! version.nil?
+        it { is_expected.to be_installed.by(installer) }          if ! installer.nil? && version.nil?
+        it { is_expected.to be_installed.by(installer).with_version(version) } if ! installer.nil? && ! version.nil?
+      end
+    end
+  end
+
+  ### PACKAGES #################################################################
+
+  describe "Development Packages", :test => :docker_image, :dev => true do
+    [
+      # [package,                   version,                    installer]
+      "gcc",
+      "git",
+      "java-1.#{ENV["OPENJDK_PRODUCT_VERSION"]}.0-openjdk-devel",
+      "make",
+      "vim-enhanced",
+      ["bundler",                   nil,                        "gem"],
+      ["rake",                      nil,                        "gem"],
+      ["rspec",                     nil,                        "gem"],
     ].each do |package, version, installer|
       describe package(package) do
         it { is_expected.to be_installed }                        if installer.nil? && version.nil?
@@ -117,14 +141,18 @@ describe "Docker image", :test => :docker_image do
       #   file,
       #   mode, user, group, [expectations],
       #   rootfs, srcfile,
-      #   sha256sum,
+      #   [match],
       # ]
       [
         "/docker-entrypoint.sh",
         755, "root", "root", [:be_file],
       ],
       [
-        "/docker-entrypoint.d/30-logstash-environment.sh",
+        "/docker-entrypoint.d/31-logstash-environment.sh",
+        644, "root", "root", [:be_file, :eq_sha256sum],
+      ],
+      [
+        "/docker-entrypoint.d/50-logstash-certs.sh",
         644, "root", "root", [:be_file, :eq_sha256sum],
       ],
       [
@@ -136,7 +164,7 @@ describe "Docker image", :test => :docker_image do
         644, "root", "root", [:be_file, :eq_sha256sum],
       ],
       [
-        "/docker-entrypoint.d/80-logstash-opts.sh",
+        "/docker-entrypoint.d/80-logstash-options.sh",
         644, "root", "root", [:be_file, :eq_sha256sum],
       ],
       [
@@ -158,6 +186,8 @@ describe "Docker image", :test => :docker_image do
       [
         "/usr/share/logstash/config/logstash.yml",
         640, "logstash", "logstash", [:be_file],
+        nil, nil,
+        "^# logstash.docker.yml$",
       ],
       [
         "/usr/share/logstash/config/log4j2.docker.properties",
@@ -165,12 +195,9 @@ describe "Docker image", :test => :docker_image do
       ],
       [
         "/usr/share/logstash/config/log4j2.properties",
-        640, "logstash", "logstash", [:be_file, :eq_sha256sum],
+        640, "logstash", "logstash", [:be_file],
         nil, nil,
-        Digest::SHA256.hexdigest(
-          "# log4j2.docker.properties\n" +
-          IO.binread("rootfs/usr/share/logstash/config/log4j2.docker.properties")
-        ),
+        "^# log4j2.docker.properties$",
       ],
       [
         "/usr/share/logstash/data",
@@ -184,11 +211,10 @@ describe "Docker image", :test => :docker_image do
         "/usr/share/logstash/pipeline",
         750, "logstash", "logstash", [:be_directory]
       ],
-    ].each do |file, mode, user, group, expectations, rootfs, srcfile, sha256sum|
+    ].each do |file, mode, user, group, expectations, rootfs, srcfile, match|
       expectations ||= []
       rootfs = "rootfs" if rootfs.nil?
       srcfile = file if srcfile.nil?
-      sha256sum = Digest::SHA256.file("#{rootfs}/#{srcfile}").to_s if expectations.include?(:eq_sha256sum) && sha256sum.nil?
       context file(file) do
         it { is_expected.to exist }
         it { is_expected.to be_file }       if expectations.include?(:be_file)
@@ -196,7 +222,76 @@ describe "Docker image", :test => :docker_image do
         it { is_expected.to be_mode(mode) } unless mode.nil?
         it { is_expected.to be_owned_by(user) } unless user.nil?
         it { is_expected.to be_grouped_into(group) } unless group.nil?
-        its(:sha256sum) { is_expected.to eq(sha256sum) } if expectations.include?(:eq_sha256sum)
+        case match
+        when String
+          its(:content) { is_expected.to match(match) }
+        when Array
+          match.each do |m|
+            its(:content) { is_expected.to match(m) }
+          end
+        end
+        its(:sha256sum) do
+          is_expected.to eq(
+            Digest::SHA256.file("#{rootfs}/#{srcfile}").to_s
+          )
+        end if expectations.include?(:eq_sha256sum)
+      end
+    end
+  end
+
+  ### XPACK_FILES ##############################################################
+
+  describe "X-Pack Files", :test => :docker_image, :x_pack => true do
+    [
+      # [
+      #   file,
+      #   mode, user, group, [expectations],
+      #   rootfs, srcfile,
+      #   [match],
+      # ]
+      [
+        "/docker-entrypoint.d/32-x-pack-environment.sh",
+        644, "root", "root", [:be_file, :eq_sha256sum],
+        "x-pack/rootfs",
+      ],
+      [
+        "/docker-entrypoint.d/62-x-pack-fragments.sh",
+        644, "root", "root", [:be_file, :eq_sha256sum],
+        "x-pack/rootfs",
+      ],
+      [
+        "/usr/share/logstash/config/logstash.yml",
+        640, "logstash", "logstash", [:be_file],
+        nil, nil,
+        [
+          "^# logstash.docker.yml$",
+          "^# logstash.x-pack.yml$",
+        ]
+      ],
+    ].each do |file, mode, user, group, expectations, rootfs, srcfile, match|
+      expectations ||= []
+      rootfs = "rootfs" if rootfs.nil?
+      srcfile = file if srcfile.nil?
+      context file(file) do
+        it { is_expected.to exist }
+        it { is_expected.to be_file }       if expectations.include?(:be_file)
+        it { is_expected.to be_directory }  if expectations.include?(:be_directory)
+        it { is_expected.to be_mode(mode) } unless mode.nil?
+        it { is_expected.to be_owned_by(user) } unless user.nil?
+        it { is_expected.to be_grouped_into(group) } unless group.nil?
+        case match
+        when String
+          its(:content) { is_expected.to match(match) }
+        when Array
+          match.each do |m|
+            its(:content) { is_expected.to match(m) }
+          end
+        end
+        its(:sha256sum) do
+          is_expected.to eq(
+            Digest::SHA256.file("#{rootfs}/#{srcfile}").to_s
+          )
+        end if expectations.include?(:eq_sha256sum)
       end
     end
   end

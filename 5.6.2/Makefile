@@ -10,8 +10,8 @@ CHECKSUM		?= sha1
 
 ### TEST #######################################################################
 
-# Skip Elasticsearch X-Pack tests
-SPEC_OPTS		?= --tag ~x_pack
+# Skip X-Pack and dev tests
+SPEC_OPTS		?= --tag ~x_pack --tag ~dev
 
 ### MK_DOCKER_IMAGE ############################################################
 

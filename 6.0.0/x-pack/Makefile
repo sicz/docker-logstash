@@ -5,7 +5,7 @@ BASE_IMAGE_TAG		?= $(LOGSTASH_TAG)
 
 ### DOCKER_IMAGE ###############################################################
 
-DOCKER_IMAGE_TAG	?= $(BASE_IMAGE_TAG)-x-pack
+DOCKER_IMAGE_TAG	?= $(LOGSTASH_TAG)-x-pack
 
 ### BUILD ######################################################################
 
@@ -17,8 +17,8 @@ DOCKER_CONFIG		?= x-pack
 
 ### TEST #######################################################################
 
-# Do all tests
-SPEC_OPTS		?=
+# Skip dev tests
+SPEC_OPTS		?= --tag ~dev
 
 ### MK_DOCKER_IMAGE ############################################################
 

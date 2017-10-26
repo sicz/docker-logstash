@@ -1,26 +1,5 @@
 #!/bin/bash -e
 
-### XPACK_EDITION ##############################################################
-
-# Default X-Pack edition - free Basic license
-: ${XPACK_EDITION:=basic}
-
-### ELASTICSEARCH ##############################################################
-
-: ${ELASTICSEARCH_USERNAME:=logstash}
-if [ -e /run/secrets/es_${ELASTICSEARCH_USERNAME}.pwd ]; then
-  : ${ELASTICSEARCH_PASSWORD_FILE:="/run/secrets/es_${ELASTICSEARCH_USERNAME}.pwd"}
-else
-  : ${ELASTICSEARCH_PASSWORD_FILE:="${LS_SETTINGS_DIR}/es_${ELASTICSEARCH_USERNAME}.pwd"}
-fi
-if [ -e ${ELASTICSEARCH_PASSWORD_FILE} ]; then
-  ELASTICSEARCH_PASSWORD="$(cat ${ELASTICSEARCH_PASSWORD_FILE})"
-fi
-
-if [ -n "${ELASTICSEARCH_URL}" ]; then
-  export ELASTICSEARCH_URL ELASTICSEARCH_USERNAME ELASTICSEARCH_PASSWORD
-fi
-
 ### X-PACK_MONITORING ##########################################################
 
 # X-Pack Monitoring is enabled by default
@@ -28,6 +7,13 @@ fi
 
 # X-Pack Monitoring endpoint
 : ${XPACK_MONITORING_ELASTICSEARCH_URL:=${ELASTICSEARCH_URL}}
+
+# Wait for Elasticsearch container DNS record
+if [ "${XPACK_MONITORING_ENABLED}" = "true" \
+  -a "${XPACK_MONITORING_ELASTICSEARCH_URL}" != "${ELASTICSEARCH_URL}" \
+]; then
+  WAIT_FOR_DNS="${WAIT_FOR_DNS} ${XPACK_MONITORING_ELASTICSEARCH_URL}"
+fi
 
 # X-Pack Monitoring user name and password
 : ${XPACK_MONITORING_ELASTICSEARCH_USERNAME:=logstash_system}
@@ -49,6 +35,14 @@ fi
 
 # X-Pack Management endpoint
 : ${XPACK_MANAGEMENT_ELASTICSEARCH_URL=${ELASTICSEARCH_URL}}
+
+# Wait for Elasticsearch container DNS record
+if [ "${XPACK_MANAGEMENT_ENABLED}" = "true" \
+  -a "${XPACK_MANAGEMENT_ELASTICSEARCH_URL}" != "${ELASTICSEARCH_URL}" \
+  -a "${XPACK_MANAGEMENT_ELASTICSEARCH_URL}" != "${XPACK_MONITORING_ELASTICSEARCH_URL}" \
+]; then
+  WAIT_FOR_DNS="${WAIT_FOR_DNS} ${XPACK_MANAGEMENT_ELASTICSEARCH_URL}"
+fi
 
 # X-Pack Management user name and password
 : ${XPACK_MANAGEMENT_ELASTICSEARCH_USERNAME:=logstash_system}

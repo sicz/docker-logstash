@@ -17,7 +17,9 @@ DOCKER_VERSIONS		?= 2.4.1 \
 			   5.6.2 \
 			   5.6.2/x-pack \
 			   6.0.0 \
-			   6.0.0/x-pack
+			   6.0.0/x-pack \
+			   6.0.0/dev
+
 
 # Make targets propagated to all Docker image versions
 DOCKER_VERSION_TARGETS	+= build \

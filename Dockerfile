@@ -22,14 +22,10 @@ LABEL \
 ARG CHECKSUM="sha512"
 
 ARG LOGSTASH_VERSION
-ARG LOGSTASH_TARBALL="logstash-${LOGSTASH_VERSION}.tar.gz"
-ARG LOGSTASH_TARBALL_URL="https://artifacts.elastic.co/downloads/logstash/${LOGSTASH_TARBALL}"
-ARG LOGSTASH_TARBALL_CHECKSUM_URL="${LOGSTASH_TARBALL_URL}.${CHECKSUM}"
+ARG LS_TARBALL="logstash-${LOGSTASH_VERSION}.tar.gz"
+ARG LS_TARBALL_URL="https://artifacts.elastic.co/downloads/logstash/${LS_TARBALL}"
+ARG LS_TARBALL_CHECKSUM_URL="${LS_TARBALL_URL}.${CHECKSUM}"
 ARG LS_HOME="/usr/share/logstash"
-ARG LS_SETTINGS_DIR="${LS_HOME}/config"
-ARG LS_PATH_CONF="${LS_HOME}/pipeline"
-ARG LS_PATH_DATA="${LS_HOME}/data"
-ARG LS_PATH_LOGS="${LS_HOME}/logs"
 
 ENV \
   DOCKER_USER="logstash" \
@@ -37,22 +33,18 @@ ENV \
   ELASTIC_CONTAINER="true" \
   LOGSTASH_VERSION="${LOGSTASH_VERSION}" \
   LS_HOME="${LS_HOME}" \
-  LS_SETTINGS_DIR="${LS_SETTINGS_DIR}" \
-  LS_PATH_CONF="${LS_PATH_CONF}" \
-  LS_PATH_DATA="${LS_PATH_DATA}" \
-  LS_PATH_LOGS="${LS_PATH_LOGS}" \
   PATH="${LS_HOME}/bin:${PATH}"
 
 WORKDIR ${LS_HOME}
 
 RUN set -exo pipefail; \
   adduser --uid 1000 --user-group --home-dir ${LS_HOME} ${DOCKER_USER}; \
-  curl -fLo /tmp/${LOGSTASH_TARBALL} ${LOGSTASH_TARBALL_URL}; \
-  EXPECTED_CHECKSUM=$(curl -fL ${LOGSTASH_TARBALL_CHECKSUM_URL}); \
-  TARBALL_CHECKSUM=$(${CHECKSUM}sum /tmp/${LOGSTASH_TARBALL} | cut -d " " -f 1); \
+  curl -fLo /tmp/${LS_TARBALL} ${LS_TARBALL_URL}; \
+  EXPECTED_CHECKSUM=$(curl -fL ${LS_TARBALL_CHECKSUM_URL}); \
+  TARBALL_CHECKSUM=$(${CHECKSUM}sum /tmp/${LS_TARBALL} | cut -d " " -f 1); \
   [ "${TARBALL_CHECKSUM}" = "${EXPECTED_CHECKSUM}" ]; \
-  tar xz --strip-components=1 -f /tmp/${LOGSTASH_TARBALL}; \
-  rm -f /tmp/${LOGSTASH_TARBALL}; \
+  tar xz --strip-components=1 -f /tmp/${LS_TARBALL}; \
+  rm -f /tmp/${LS_TARBALL}; \
   chown -R root:root .; \
   mv config/logstash.yml config/logstash.default.yml; \
   mv config/log4j2.properties config/log4j2.default.properties
