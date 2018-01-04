@@ -12,7 +12,7 @@ DOCKER_CONFIG		?= logstash-2
 
 ### ELASTICSEARCH ##############################################################
 
-ELASTICSEARCH_IMAGE_TAG	?= 2.4.5
+ELASTICSEARCH_IMAGE_TAG	?= 2.4.6
 
 ### TEST #######################################################################
 
