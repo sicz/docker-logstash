@@ -16,6 +16,10 @@ VARIANT_DIR		?= $(PROJECT_DIR)/dev
 # Skip X-Pack tests
 SPEC_OPTS		?= --tag ~x_pack
 
+### ELASTICSEARCH ##############################################################
+
+ELASTICSEARCH_IMAGE_TAG	?= $(BASE_IMAGE_TAG)
+
 ### MK_DOCKER_IMAGE ############################################################
 
 PROJECT_DIR		?= $(abspath ../..)
