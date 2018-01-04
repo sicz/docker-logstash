@@ -1,7 +1,7 @@
 ### BASE_IMAGE #################################################################
 
 OPENJDK_PRODUCT_VERSION	?= 8
-OPENJDK_UPDATE_VERSION	?= 144
+OPENJDK_UPDATE_VERSION	?= 151
 
 BASE_IMAGE_NAME		?= $(DOCKER_PROJECT)/openjdk
 BASE_IMAGE_TAG		?= $(OPENJDK_PRODUCT_VERSION)u$(OPENJDK_UPDATE_VERSION)-jre-centos

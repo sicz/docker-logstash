@@ -1,9 +1,7 @@
 ### SHELL ######################################################################
 
-# Replace Debian Almquist Shell with Bash
-ifeq ($(realpath $(SHELL)),/bin/dash)
+# Use bash as a shell
 SHELL   		:= /bin/bash
-endif
 
 # Exit immediately if a command exits with a non-zero exit status
 # TODO: .SHELLFLAGS does not exists on obsoleted macOS X-Code make
@@ -14,11 +12,9 @@ SHELL			+= -e
 
 # Docker image versions
 DOCKER_VERSIONS		?= 2.4.1 \
-			   5.6.3 \
-			   5.6.3/x-pack \
-			   6.0.0 \
-			   6.0.0/x-pack \
-			   6.0.0/dev
+			   6.1.1 \
+			   6.1.1/x-pack \
+			   6.1.1/dev
 
 
 # Make targets propagated to all Docker image versions
@@ -44,6 +40,14 @@ $(DOCKER_VERSION_TARGETS):
 	@for DOCKER_VERSION in $(DOCKER_VERSIONS); do \
 		cd $(CURDIR)/$${DOCKER_VERSION}; \
 		$(MAKE) display-version-header $@; \
+	done
+# Do docker-pull-baseimage only on pure Logstash
+docker-pull-baseimage:
+	@for DOCKER_VERSION in $(DOCKER_VERSIONS); do \
+		if [[ $${DOCKER_VERSION} =~ ^[0-9]+(\.[0-9]+)*$$ ]]; then \
+			cd $(CURDIR)/$${DOCKER_VERSION}; \
+			$(MAKE) display-version-header $@; \
+		fi; \
 	done
 
 ################################################################################

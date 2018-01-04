@@ -12,7 +12,7 @@ services:
       - ELASTICSEARCH_URL=https://elasticsearch.local:9200
       - XPACK_MONITORING_ENABLED=true
       - XPACK_MONITORING_ELASTICSEARCH_USERNAME=logstash_system
-      - XPACK_MONITORING_ELASTICSEARCH_PASSWORD=s3cret.p@ssw0rd
+      - XPACK_MONITORING_ELASTICSEARCH_PASSWORD=P@ssw0rd.
 
   elasticsearch:
     image: ${ELASTICSEARCH_IMAGE}
@@ -25,7 +25,7 @@ services:
       - SERVER_CRT_HOST=elasticsearch.local
       - SIMPLE_CA_URL=https://simple-ca.local
       - XPACK_EDITION=platinum
-      - XPACK_BOOTSTRAP_PASSWORD=s3cret.p@ssw0rd
+      - XPACK_BOOTSTRAP_PASSWORD=P@ssw0rd.
       - discovery.type=single-node
       - xpack.security.http.ssl.enabled=true
     networks:

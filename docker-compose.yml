@@ -12,7 +12,6 @@ services:
     image: ${DOCKER_IMAGE}
     depends_on:
       - simple_ca
-    # TODO: Logstash 2.x does not support --config.string and --pipeline.workers
     command:
       --pipeline.workers 2
       --config.string
