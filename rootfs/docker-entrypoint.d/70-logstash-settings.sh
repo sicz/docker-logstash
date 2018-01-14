@@ -30,4 +30,23 @@ if [ ! -e ${LS_SETTINGS_DIR}/logstash.yml ]; then
   fi
 fi
 
+
+### PIPELINES_YML ##############################################################
+
+if [ ! -e ${LS_SETTINGS_DIR}/pipelines.yml ]; then
+  PIPELINE_YML_FILES="$(find ${LS_PATH_CONF} -maxdepth 2 -name pipeline.yml)"
+  if [ -n "${PIPELINE_YML_FILES}" ]; then
+    info "Creating ${LS_SETTINGS_DIR}/pipelines.yml"
+    (
+      for PIPELINE_YML_FILE in ${PIPELINE_YML_FILES}; do
+        echo "# ${PIPELINE_YML_FILE}"
+        cat ${LS_SETTINGS_DIR}/${PIPELINE_YML_FILE}
+      done
+    ) > ${LS_SETTINGS_DIR}/pipelines.yml
+    if [ -n "${DOCKER_ENTRYPOINT_DEBUG}" ]; then
+      cat ${LS_SETTINGS_DIR}/pipelines.yml
+    fi
+  fi
+fi
+
 ################################################################################
