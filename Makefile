@@ -11,8 +11,7 @@ SHELL			+= -e
 ### DOCKER_VERSIONS ############################################################
 
 # Docker image versions
-DOCKER_VERSIONS		?= 2.4.1 \
-			   6.2.2 \
+DOCKER_VERSIONS		?= 6.2.2 \
 			   6.2.2/x-pack \
 			   6.2.2/dev
 

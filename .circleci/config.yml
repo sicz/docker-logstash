@@ -24,11 +24,6 @@ jobs:
             make docker-pull-dependencies
             make docker-pull-testimage
       - run:
-          name: sicz/logstash:2.4.1
-          working_directory: 2.4.1
-          command: |
-            make ci
-      - run:
           name: sicz/logstash:6.2.2
           working_directory: 6.2.2
           command: |
